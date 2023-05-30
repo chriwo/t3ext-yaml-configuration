@@ -53,10 +53,13 @@ class AbstractTableCommand extends Command
      */
     protected $tableColumnCache = [];
 
+    protected YamlFileLoader $yamlFileLoader;
+
     public function __construct(
-        protected YamlFileLoader $yamlFileLoader,
+        YamlFileLoader $yamlFileLoader,
         string $name = null
     ) {
+        $this->yamlFileLoader = $yamlFileLoader;
         parent::__construct($name);
     }
 
