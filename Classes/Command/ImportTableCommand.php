@@ -97,7 +97,6 @@ class ImportTableCommand extends AbstractTableCommand
         $matchFields = $this->matchFields;
         $columnNames = $this->getColumnNames();
         $this->doMatchFieldsExists($matchFields, $columnNames, $io);
-        $queryBuilder = $this->queryBuilderForTable($table);
         $countUpdates = 0;
         $countInserts = 0;
         if ($this->file === null) {
@@ -119,8 +118,6 @@ class ImportTableCommand extends AbstractTableCommand
             foreach ($records as $record) {
                 $record = $this->flattenYamlFields($record);
                 $row = false;
-                $whereClause = false;
-                $queryResult = false;
                 $matchClauseParts = [];
                 foreach ($matchFields as $matchField) {
                     if (isset($record[$matchField])) {
