@@ -130,20 +130,17 @@ class ImportTableCommand extends AbstractTableCommand
                 if (!empty($matchClauseParts)) {
                     $queryBuilderWithoutRestrictions = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
                     $queryBuilderWithoutRestrictions->getRestrictions()->removeAll();
-                    $row = $queryBuilderWithoutRestrictions
+                    $rowQueryBuilder = $queryBuilderWithoutRestrictions
                         ->select('*')
                         ->from($table);
                     $whereClause = [];
                     foreach ($matchClauseParts as $matchClausePart) {
-                        $whereClause[] = $queryBuilder->expr()->andX(
-                            $queryBuilder->expr()->eq(
-                                $matchClausePart[0],
-                                // @TODO: Use named parameters based on the column configuration in the DB
-                                $matchClausePart[1]
-                            )
+                        $whereClause[] = $queryBuilderWithoutRestrictions->expr()->eq(
+                            $matchClausePart[0],
+                            $queryBuilderWithoutRestrictions->createNamedParameter($matchClausePart[1])
                         );
                     }
-                    $row = $row->where(...$whereClause)->execute()->fetch();
+                    $row = $rowQueryBuilder->where(...$whereClause)->executeQuery()->fetchAssociative();
                 }
                 if ($row) {
                     // Update row as the matched row exists in the table

@@ -55,7 +55,7 @@ class AbstractTableCommand extends Command
 
     public function __construct(
         protected YamlFileLoader $yamlFileLoader,
-        string $name = null
+        ?string $name = null
     ) {
         parent::__construct($name);
     }
@@ -89,16 +89,16 @@ class AbstractTableCommand extends Command
         $result = $this->queryBuilderForTable($table)
             ->select('*')
             ->from($table)
-            ->execute()
-            ->fetch();
+            ->executeQuery()
+            ->fetchAssociative();
         if ($result) {
             $columnNames = \array_keys($result);
             $this->tableColumnCache[$table] = $columnNames;
         } else {
-            $result = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($table);
-            $result = $result->getSchemaManager()->listTableColumns($table);
-            foreach ($result as $columnName => $columnProperties) {
-                $columnNames[] = $columnName;
+            $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($table);
+            $columns = $connection->createSchemaManager()->listTableColumns($table);
+            foreach ($columns as $column) {
+                $columnNames[] = $column->getName();
             }
             $this->tableColumnCache[$table] = $columnNames;
         }

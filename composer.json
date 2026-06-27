@@ -30,9 +30,9 @@
 		}
 	],
 	"require": {
-		"typo3/cms-core": "^11 || ^12",
-		"php": "^8.0",
-		"symfony/yaml": "^5 || ^6"
+		"typo3/cms-core": "^12.4 || ^13.4",
+		"php": ">=8.1 <=8.5.99",
+		"symfony/yaml": "^6 || ^7"
 	},
 	"extra": {
 		"typo3/cms": {

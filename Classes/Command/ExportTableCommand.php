@@ -227,14 +227,15 @@ class ExportTableCommand extends AbstractTableCommand
                 $result->getRestrictions()->removeByType(HiddenRestriction::class);
             }
         }
-        $result = $result
+        $rows = $result
             ->select('*')
             ->from($table)
-            ->execute();
+            ->executeQuery()
+            ->fetchAllAssociative();
         // Rows were found in the table
-        if ($result->rowCount()) {
+        if (!empty($rows)) {
             $explodedResult = [];
-            foreach ($result as $row) {
+            foreach ($rows as $row) {
                 $explodedRow = [];
                 foreach ($row as $column => $value) {
                     // If --use-only-columns option is used, the column is only added if it is part of the option value.
@@ -270,7 +271,8 @@ class ExportTableCommand extends AbstractTableCommand
                                         )
                                     )
                             )
-                            ->execute();
+                            ->executeQuery()
+                            ->fetchAllAssociative();
                         $usergroupsTitles = [];
                         foreach ($usergroups as $singleUserGroup) {
                             $usergroupsTitles[] = $singleUserGroup['title'];
@@ -310,7 +312,7 @@ class ExportTableCommand extends AbstractTableCommand
             $yaml = Yaml::dump($dump, 20, $this->indentLevel);
         }
         // Generated YAML is written to file
-        if ($yaml !== '' && $result->rowCount() > 0) {
+        if ($yaml !== '' && !empty($rows)) {
             $io->note('Export to ' . GeneralUtility::getFileAbsFileName($this->file));
             $persistYamlFile = GeneralUtility::writeFile(
                 $filePath = GeneralUtility::getFileAbsFileName($this->file),
@@ -319,7 +321,7 @@ class ExportTableCommand extends AbstractTableCommand
             if ($persistYamlFile) {
                 $io->listing(
                     [
-                        $result->rowCount() . ' records were exported.'
+                        count($rows) . ' records were exported.'
                     ]
                 );
                 $io->success('Successfully finished the export of ' . $table . ' into ' . GeneralUtility::getFileAbsFileName($this->file));
